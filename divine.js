@@ -13,7 +13,7 @@ class DivinePride {
 
     var j = request.jar();
     var cookie = request.cookie('lang=pt');
-    var url = `https://www.divine-pride.net/database/search?q=${this.input}`
+    var url = `https://www.divine-pride.net/database/search?q=${encodeURIComponent(this.input)}`
     j.setCookie(cookie, url);
 
     request({ jar: j, url: url}, (error, response, body) => {
