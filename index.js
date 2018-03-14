@@ -11,12 +11,12 @@ client.on('ready', () => {
   client.user.setGame('Digite !dp')
 });
 
-commands.register('item', (input, message) => new DivinePride(input, message).item())
-commands.register('mob', (input, message) => new DivinePride(input, message).mob())
-commands.register('map', (input, message) => new DivinePride(input, message).map())
-commands.register('skill', (input, message) => new DivinePride(input, message).skill())
-commands.register('npc', (input, message) => new DivinePride(input, message).npc())
-commands.register('quest', (input, message) => new DivinePride(input, message).quest())
+commands.register('item', (input, message) => new DivinePride(input, message).search('items'))
+commands.register('mob', (input, message) => new DivinePride(input, message).search('monster'))
+commands.register('map', (input, message) => new DivinePride(input, message).search('map'))
+commands.register('skill', (input, message) => new DivinePride(input, message).search('skill'))
+commands.register('npc', (input, message) => new DivinePride(input, message).search('npc'))
+commands.register('quest', (input, message) => new DivinePride(input, message).search('quest'))
 
 const help = (input, message) => {
   message.channel.send("", {

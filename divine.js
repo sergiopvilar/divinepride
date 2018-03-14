@@ -47,28 +47,8 @@ class DivinePride {
     }
   }
 
-  item() {
-    this.getFirst('items', (res) => this.answer(res))
-  }
-
-  mob() {
-    this.getFirst('monster', (res) => this.answer(res))
-  }
-
-  map() {
-    this.getFirst('map', (res) => this.answer(res))
-  }
-
-  quest() {
-    this.getFirst('quest', (res) => this.answer(res))
-  }
-
-  skill() {
-    this.getFirst('skill', (res) => this.answer(res))
-  }
-
-  npc() {
-    this.getFirst('npc', (res) => this.answer(res))
+  search(type) {
+    this.getFirst(type, (res) => this.answer(res))
   }
 
 }
