@@ -85,16 +85,54 @@ class DivinePride {
       message += this.fixDescription(obj.description) + "\n"
       message += "```\n"
       this.message.channel.send(message)
-      console.log(obj)
     })
 
   }
 
+  answerMonster(res) {
+    let arr = res.split('/')
+    let elements = ['Neutro', 'Água', 'Terra', 'Fogo', 'Vento', 'Veneno', 'Sagrado', 'Sombrio', 'Fantasma', 'Maldito']
+
+    if (_.isEmpty(res)) {
+      this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+      return
+    }
+
+    this.api.fetch('Monster', arr[3], (obj) => {
+      let message = ''
+      let vulnerabilities = []
+
+      _.each(obj.propertyTable, (value, key) => {
+        if(value > 100) vulnerabilities.push({value: value, element: `${elements[parseInt(key)]}`})
+      })
+
+      vulnerabilities.sort((a, b) => b.value - a.value)
+      vulnerabilities = vulnerabilities.map((item) => `${item.element}(${item.value}%)`)
+
+      message += "" + obj.name + "\n"
+      message += `http://www.divine-pride.net${res}\n`
+      message += "```\n"
+      message += `Nível: ${obj.stats.level}\n`
+      message += `HP: ${obj.stats.health}\n`
+      message += `Precisão: ${obj.stats.hit}\n`
+
+      if (vulnerabilities.length > 0)
+        message += `Vulnerabilidades: ${vulnerabilities.join(', ')}`
+
+      message += "```\n"
+
+      this.message.channel.send(message)
+    })
+  }
+
   search(type) {
-    if(type !== 'items')
-      this.getFirst(type, (res) => this.answer(res))
-    else {
+    console.log(type)
+    if(type === 'items'){
       this.getFirst(type, (res) => this.answerDescription(res))
+    } else if(type == 'monster') {
+      this.getFirst(type, (res) => this.answerMonster(res))
+    } else {
+      this.getFirst(type, (res) => this.answer(res))
     }
   }
 
