@@ -33,6 +33,11 @@ class DivinePride {
         if (this.$(el).find('a').text().toLowerCase() == this.input.toLowerCase()) choosen = this.$(el).find('a').attr('href')
       })
 
+      if(!choosen)
+        matches.map((index, el) => {
+          if (this.$(el).find('a').text().toLowerCase().indexOf(this.input.toLowerCase()) > -1) choosen = this.$(el).find('a').attr('href')
+        })
+
       if (!choosen) choosen = matches.eq(0).find('a').attr('href')
 
       callback(choosen)
@@ -126,7 +131,6 @@ class DivinePride {
   }
 
   search(type) {
-    console.log(type)
     if(type === 'items'){
       this.getFirst(type, (res) => this.answerDescription(res))
     } else if(type == 'monster') {
