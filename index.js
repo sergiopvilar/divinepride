@@ -17,6 +17,7 @@ commands.register('map', (input, message) => new DivinePride(input, message).sea
 commands.register('skill', (input, message) => new DivinePride(input, message).search('skill'))
 commands.register('npc', (input, message) => new DivinePride(input, message).search('npc'))
 commands.register('quest', (input, message) => new DivinePride(input, message).search('quest'))
+commands.register('xp', (input, message) => new DivinePride(input, message).exp())
 
 const help = (input, message) => {
   message.channel.send("", {

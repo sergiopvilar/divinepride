@@ -11,11 +11,11 @@ class DivinePride {
     this.message = message
   }
 
-  fetch(callback) {
+  fetch(callback, input = this.input) {
 
     var j = request.jar();
     var cookie = request.cookie('lang=pt');
-    var url = `https://www.divine-pride.net/database/search?q=${encodeURIComponent(this.input)}`
+    var url = `https://www.divine-pride.net/database/search?q=${encodeURIComponent(input)}`
     j.setCookie(cookie, url);
 
     request({ jar: j, url: url}, (error, response, body) => {
@@ -24,24 +24,24 @@ class DivinePride {
     });
   }
 
-  getFirst(type, callback) {
+  getFirst(type, callback, input = this.input) {
     this.fetch(() => {
       let matches = this.$(`#${type}`).find('table tbody tr')
         , choosen = false
 
       matches.map((index, el) => {
-        if (this.$(el).find('a').text().toLowerCase() == this.input.toLowerCase()) choosen = this.$(el).find('a').attr('href')
+        if (this.$(el).find('a').text().toLowerCase() == input.toLowerCase()) choosen = this.$(el).find('a').attr('href')
       })
 
       if(!choosen)
         matches.map((index, el) => {
-          if (this.$(el).find('a').text().toLowerCase().indexOf(this.input.toLowerCase()) > -1) choosen = this.$(el).find('a').attr('href')
+          if (this.$(el).find('a').text().toLowerCase().indexOf(input.toLowerCase()) > -1) choosen = this.$(el).find('a').attr('href')
         })
 
       if (!choosen) choosen = matches.eq(0).find('a').attr('href')
 
       callback(choosen)
-    })
+    }, input)
   }
 
   answer(res) {
@@ -52,6 +52,68 @@ class DivinePride {
     } else {
       this.message.channel.send("Resultado da busca por '" + this.input + "': \n" + url)
     }
+  }
+
+  expMultiplier(monsterLevel, baseLevel) {
+    let modifier = 0
+      , levelDiff = monsterLevel - baseLevel
+
+    console.log(monsterLevel, baseLevel)
+
+    if(levelDiff > 15) {
+      modifier = 0.4
+    } else if (levelDiff <= 15 && levelDiff >= 10) {
+      modifier = (140 - ((levelDiff - 10)*5))/100
+    } else if(levelDiff <= 9 && levelDiff >= 3) {
+      modifier = (140 - ((10 - levelDiff) * 5))/100
+    } else if (levelDiff <= 2 && levelDiff >= -5) {
+      modifier = 1
+    } else if(levelDiff <= -6 && levelDiff >= -10) {
+      modifier = 0.95
+    } else if (levelDiff <= -12 && levelDiff >= -15) {
+      modifier = 0.9
+    } else if (levelDiff <= -16 && levelDiff >= -20) {
+      modifier = 0.85
+    } else if (levelDiff <= -21 && levelDiff >= -25) {
+      modifier = 0.6
+    } else if (levelDiff <= -26 && levelDiff >= -30) {
+      modifier = 0.35
+    } else {
+      modifier = 0.1
+    }
+
+    return modifier
+  }
+
+  exp() {
+    let levels = _.last(this.input.split(' '))
+      , monster = this.input.replace(_.last(this.input.split(' ')), '').trim()
+      , levelBase = parseInt(_.first(levels.split('/')))
+      , arr
+      , modifier
+      , message = ''
+
+    this.getFirst('monster', (res) => {
+
+      if (_.isEmpty(res)) {
+        this.message.reply("Não é possível encontrar um resultado para '" + monster + "'.")
+        return
+      }
+
+      arr = res.split('/')
+      this.api.fetch('Monster', arr[3], (obj) => {
+        modifier = this.expMultiplier(obj.stats.level, levelBase)
+
+        message += "" + obj.name + "\n"
+        message += `http://www.divine-pride.net${res}\n`
+        message += "```\n"
+        message += `Base XP: ${Math.round(obj.stats.baseExperience * modifier)} (${Math.round(modifier * 100)}%)\n`
+        message += `Job XP: ${Math.round(obj.stats.jobExperience * modifier)} (${Math.round(modifier * 100)}%)\n`
+        message += "```\n"
+
+        this.message.channel.send(message)
+      })
+    }, monster)
   }
 
   fixDescription(desc) {
