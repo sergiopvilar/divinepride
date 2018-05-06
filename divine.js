@@ -137,12 +137,14 @@ class DivinePride {
   }
 
   answerDescription(res) {
-    let arr = res.split('/')
+    let arr
 
     if (_.isEmpty(res)) {
       this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
       return
     }
+
+    arr = res.split('/')
 
     this.api.fetch(arr[2], arr[3], (obj) => {
       let message = ''
@@ -157,13 +159,15 @@ class DivinePride {
   }
 
   answerMonster(res) {
-    let arr = res.split('/')
+    let arr
     let elements = ['Neutro', 'Água', 'Terra', 'Fogo', 'Vento', 'Veneno', 'Sagrado', 'Sombrio', 'Fantasma', 'Maldito']
 
     if (_.isEmpty(res)) {
       this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
       return
     }
+
+    arr = res.split('/')
 
     this.api.fetch('Monster', arr[3], (obj) => {
       let message = ''
