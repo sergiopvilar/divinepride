@@ -5,6 +5,7 @@ const Commander = require('./commander.js');
 const DivinePride = require('./divine.js');
 const client = new Discord.Client();
 const commands = new Commander(client, '!')
+const buyIds = require('./storebuy.js')
 
 client.on('ready', () => {
   console.log('I am ready!');
@@ -18,6 +19,21 @@ commands.register('skill', (input, message) => new DivinePride(input, message).s
 commands.register('npc', (input, message) => new DivinePride(input, message).search('npc'))
 commands.register('quest', (input, message) => new DivinePride(input, message).search('quest'))
 commands.register('xp', (input, message) => new DivinePride(input, message).exp())
+
+commands.register('compra', (input, message) => {
+  let dp = new DivinePride(input, message)
+
+  dp.getFirst('items', (res) => {
+    dp.api.fetch('item', res.split('/')[3], (obj) => {
+      if(!obj) return message.reply(' não posso encontrar o item')
+      if (buyIds.indexOf(obj.id.toString()) > -1)
+        message.reply(' ' + obj.name + ' pode ser comprado na Loja de Compras :white_check_mark:')
+      else
+        message.reply(' ' + obj.name + ' não pode ser comprado na Loja de Compras :warning:')
+    })
+
+  })
+})
 
 const help = (input, message) => {
   message.channel.send("", {
