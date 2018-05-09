@@ -28,8 +28,12 @@ class DivinePride {
     this.fetch(() => {
       let matches = this.$(`#${type}`).find('table tbody tr')
         , choosen = false
+        , first
+        , counter = 0
 
       matches.map((index, el) => {
+        if (counter == 0) first = this.$(el).find('a').attr('href')
+        counter++
         if (this.$(el).find('a').text().toLowerCase() == input.toLowerCase()) choosen = this.$(el).find('a').attr('href')
       })
 
@@ -38,7 +42,7 @@ class DivinePride {
           if (this.$(el).find('a').text().toLowerCase().indexOf(input.toLowerCase()) > -1) choosen = this.$(el).find('a').attr('href')
         })
 
-      if (!choosen) choosen = matches.eq(0).find('a').attr('href')
+      if (!choosen) choosen = first
 
       callback(choosen)
     }, input)
@@ -139,15 +143,15 @@ class DivinePride {
   answerDescription(res) {
     let arr
 
-    if (_.isEmpty(res)) {
-      this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
-      return
-    }
+    if (_.isEmpty(res)) return this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
 
     arr = res.split('/')
 
     this.api.fetch(arr[2], arr[3], (obj) => {
       let message = ''
+
+      if (!obj) return this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+
       message += "" + obj.name + "\n"
       message += `http://www.divine-pride.net${res}\n`
       message += "```\n"
@@ -163,7 +167,7 @@ class DivinePride {
     let elements = ['Neutro', 'Água', 'Terra', 'Fogo', 'Vento', 'Veneno', 'Sagrado', 'Sombrio', 'Fantasma', 'Maldito']
 
     if (_.isEmpty(res)) {
-      this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+      this.message.reply("não consigo achar nada para '" + this.input + "', por favor seja mais específico.")
       return
     }
 
