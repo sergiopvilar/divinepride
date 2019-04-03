@@ -5,10 +5,18 @@ const Api = require('./api')
 
 class DivinePride {
 
-  constructor(input, message) {
+  constructor(input) {
     this.api = new Api()
     this.input = input
-    this.message = message
+    this.callbacks = {reply: [], message: []}
+  }
+
+  on(event, callback) {
+    this.callbacks[event].push(callback)
+  }
+
+  trigger(event, message) {
+    this.callbacks[event].map((c) => c(message))
   }
 
   fetch(callback, input = this.input) {
@@ -52,17 +60,15 @@ class DivinePride {
     let url = `http://www.divine-pride.net${res}`
 
     if(_.isEmpty(res)) {
-      this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+      this.trigger('reply', "Não é possível encontrar um resultado para '" + this.input + "'.")
     } else {
-      this.message.channel.send("Resultado da busca por '" + this.input + "': \n" + url)
+      this.trigger('message', "Resultado da busca por '" + this.input + "': \n" + url)
     }
   }
 
   expMultiplier(monsterLevel, baseLevel) {
     let modifier = 0
       , levelDiff = monsterLevel - baseLevel
-
-    console.log(monsterLevel, baseLevel)
 
     if(levelDiff > 15) {
       modifier = 0.4
@@ -89,7 +95,7 @@ class DivinePride {
     return modifier
   }
 
-  exp() {
+  exp(markup = true) {
     let levels = _.last(this.input.split(' '))
       , monster = this.input.replace(_.last(this.input.split(' ')), '').trim()
       , levelBase = parseInt(_.first(levels.split('/')))
@@ -100,7 +106,7 @@ class DivinePride {
     this.getFirst('monster', (res) => {
 
       if (_.isEmpty(res)) {
-        this.message.reply("Não é possível encontrar um resultado para '" + monster + "'.")
+        this.trigger('reply', "Não é possível encontrar um resultado para '" + monster + "'.")
         return
       }
 
@@ -110,12 +116,12 @@ class DivinePride {
 
         message += "" + obj.name + "\n"
         message += `http://www.divine-pride.net${res}\n`
-        message += "```\n"
+        if(markup) message += "```\n"
         message += `Base XP: ${Math.round(obj.stats.baseExperience * modifier)} (${Math.round(modifier * 100)}%)\n`
         message += `Job XP: ${Math.round(obj.stats.jobExperience * modifier)} (${Math.round(modifier * 100)}%)\n`
-        message += "```\n"
+        if(markup) message += "```\n"
 
-        this.message.channel.send(message)
+        this.trigger('message', message)
       })
     }, monster)
   }
@@ -140,34 +146,38 @@ class DivinePride {
     return desc
   }
 
-  answerDescription(res) {
+  answerDescription(res, markup) {
     let arr
 
-    if (_.isEmpty(res)) return this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+    if (_.isEmpty(res)) return this.trigger('reply', "Não é possível encontrar um resultado para '" + this.input + "'.")
 
     arr = res.split('/')
 
     this.api.fetch(arr[2], arr[3], (obj) => {
       let message = ''
 
-      if (!obj) return this.message.reply("Não é possível encontrar um resultado para '" + this.input + "'.")
+      if (!obj) return this.trigger('reply', "Não é possível encontrar um resultado para '" + this.input + "'.")
 
       message += "" + obj.name + "\n"
       message += `http://www.divine-pride.net${res}\n`
-      message += "```\n"
-      message += this.fixDescription(obj.description) + "\n"
-      message += "```\n"
-      this.message.channel.send(message)
+
+      if(markup) {
+        message += "```\n"
+        message += this.fixDescription(obj.description) + "\n"
+        message += "```\n"
+      }
+
+      this.trigger('message', message)
     })
 
   }
 
-  answerMonster(res) {
+  answerMonster(res, markup) {
     let arr
     let elements = ['Neutro', 'Água', 'Terra', 'Fogo', 'Vento', 'Veneno', 'Sagrado', 'Sombrio', 'Fantasma', 'Maldito']
 
     if (_.isEmpty(res)) {
-      this.message.reply("não consigo achar nada para '" + this.input + "', por favor seja mais específico.")
+      this.trigger('reply', "não consigo achar nada para '" + this.input + "', por favor seja mais específico.")
       return
     }
 
@@ -177,6 +187,8 @@ class DivinePride {
       let message = ''
       let vulnerabilities = []
 
+      if(!obj) return
+
       _.each(obj.propertyTable, (value, key) => {
         if(value > 100) vulnerabilities.push({value: value, element: `${elements[parseInt(key)]}`})
       })
@@ -185,26 +197,26 @@ class DivinePride {
       vulnerabilities = vulnerabilities.map((item) => `${item.element}(${item.value}%)`)
 
       message += "" + obj.name + "\n"
-      message += `http://www.divine-pride.net${res}\n`
-      message += "```\n"
-      message += `Nível: ${obj.stats.level}\n`
-      message += `HP: ${obj.stats.health}\n`
-      message += `Precisão: ${obj.stats.hit}\n`
+      message += `http://www.divine-pride.net${res}`
+      if(markup) {
+        message += "\n```\n"
+        message += `Nível: ${obj.stats.level}\n`
+        message += `HP: ${obj.stats.health}\n`
+        message += `Precisão: ${obj.stats.hit}\n`
+        if (vulnerabilities.length > 0) message += `Vulnerabilidades: ${vulnerabilities.join(', ')}`
 
-      if (vulnerabilities.length > 0)
-        message += `Vulnerabilidades: ${vulnerabilities.join(', ')}`
+        message += "```\n"
+      }
 
-      message += "```\n"
-
-      this.message.channel.send(message)
+      this.trigger('message', message)
     })
   }
 
-  search(type) {
+  search(type, markup = true) {
     if(type === 'items'){
-      this.getFirst(type, (res) => this.answerDescription(res))
+      this.getFirst(type, (res) => this.answerDescription(res, markup))
     } else if(type == 'monster') {
-      this.getFirst(type, (res) => this.answerMonster(res))
+      this.getFirst(type, (res) => this.answerMonster(res, markup))
     } else {
       this.getFirst(type, (res) => this.answer(res))
     }
