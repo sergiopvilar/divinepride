@@ -3,16 +3,16 @@ const Commander = require('../Commander.js');
 const DivinePride = require('../divine.js');
 const DiscordCommander = new Commander('!')
 
-function DiscordHanlder(input, message) {
+function DiscordHanlder(input, obj) {
   let dp
 
   try {
-    dp = new DivinePride(input)
-    dp.on('message', (txt) => message.channel.send(txt))
-    dp.on('reply', (txt) => message.reply(txt))
+    dp = new DivinePride(input, obj.key)
+    dp.on('message', (txt) => obj.message.channel.send(txt))
+    dp.on('reply', (txt) => obj.message.reply(txt))
   } catch (e) {
     console.log('error: ' + e.message)
-    message.reply('houve um erro com sua requisição.')
+    obj.message.reply('houve um erro com sua requisição.')
   }
 
   return dp
@@ -27,13 +27,18 @@ DiscordCommander.register('quest', (input, message) => DiscordHanlder(input, mes
 DiscordCommander.register('xp', (input, message) => DiscordHanlder(input, message).exp())
 DiscordCommander.register('dp', (input, message) => message.channel.send("", discordHelp))
 
-module.exports = (token) => {
+module.exports = (api_key, token) => {
   let DiscordClient
 
   try {
     DiscordClient = new Discord.Client();
 
-    DiscordClient.on('message', message => DiscordCommander.parse(message.content, message))
+    DiscordClient.on('message', message => {
+      DiscordCommander.parse(message.content, {
+        message: message,
+        key: api_key
+      })
+    })
     DiscordClient.on('ready', () => {
       console.log('discord: connected!');
       DiscordClient.user.setActivity('Digite !dp')

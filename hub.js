@@ -10,9 +10,10 @@ const DiscordClient = require('./clients/discord.js')
  *    channels: []
  *  },
  *  discord_token: 'foo'
+ *  api_key: 'foo'
  * }
  */
 module.exports = function(config) {
-  TwitchClient(config.twitch.username, config.twitch.token, config.twitch.channels)
-  DiscordClient(config.discord_token)
+  TwitchClient(config.api_key, config.twitch.username, config.twitch.token, config.twitch.channels)
+  DiscordClient(config.api_key, config.discord_token)
 }

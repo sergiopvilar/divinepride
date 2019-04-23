@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const hub = require('./hub.js')({
+  api_key: process.env.API_KEY,
   discord_token: process.env.BOT_TOKEN,
   twitch: {
     username: process.env.TWITCH_USERNAME,

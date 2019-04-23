@@ -5,8 +5,8 @@ const Api = require('./api')
 
 class DivinePride {
 
-  constructor(input) {
-    this.api = new Api()
+  constructor(input, apiKey) {
+    this.api = new Api(apiKey)
     this.input = input
     this.callbacks = {reply: [], message: []}
   }

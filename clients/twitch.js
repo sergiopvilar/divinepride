@@ -7,7 +7,7 @@ function TwitchHandler(message, obj) {
   let dp
 
   try {
-    dp = new DivinePride(message)
+    dp = new DivinePride(message, obj.key)
     dp.on('message', (txt) => obj.client.say(obj.channel, txt))
     dp.on('reply', (txt) => obj.client.say(obj.channel, txt))
   } catch (e) {
@@ -26,7 +26,7 @@ TwitchCommander.register('npc', (message, obj) => TwitchHandler(message, obj).se
 TwitchCommander.register('quest', (message, obj) => TwitchHandler(message, obj).search('quest', false))
 TwitchCommander.register('xp', (message, obj) => TwitchHandler(message, obj).exp(false))
 
-module.exports = (username, token, channels) => {
+module.exports = (api_key, username, token, channels) => {
   let TwitchClient
 
   try {
@@ -48,6 +48,7 @@ module.exports = (username, token, channels) => {
     TwitchClient.on('chat', (channel, userstate, message, self) => {
       if (self) return
       TwitchCommander.parse(message, {
+        key: api_key,
         client: TwitchClient,
         channel: channel
       })
