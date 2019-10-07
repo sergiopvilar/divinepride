@@ -1,5 +1,6 @@
-const TwitchClient = require('./clients/twitch.js')
-const DiscordClient = require('./clients/discord.js')
+import Client from './clients/client'
+import DiscordHandler from './clients/discord'
+import TwitchHandler from './clients/twitch'
 
 /**
  * Config object
@@ -14,6 +15,6 @@ const DiscordClient = require('./clients/discord.js')
  * }
  */
 module.exports = function(config) {
-  TwitchClient(config.api_key, config.twitch.username, config.twitch.token, config.twitch.channels)
-  DiscordClient(config.api_key, config.discord_token)
+  Client(config.api_key, new DiscordHandler(config.discord_token))
+  Client(config.api_key, new TwitchHandler(config.twitch))
 }

@@ -1,62 +1,51 @@
-const Commander = require('../Commander.js');
-const DivinePride = require('../divine.js');
-const TwitchJS = require('twitch-js')
-const TwitchCommander = new Commander('!')
+import Handler from './handler'
+import TwitchJS from 'twitch-js'
 
-function TwitchHandler(message, obj) {
-  let dp
+export default class Twitch extends Handler {
 
-  try {
-    dp = new DivinePride(message, obj.key)
-    dp.on('message', (txt) => obj.client.say(obj.channel, txt))
-    dp.on('reply', (txt) => obj.client.say(obj.channel, txt))
-  } catch (e) {
-    console.log('error:' + e.message)
-    obj.client.say('Houve um erro na sua requisição.')
+  constructor(config) {
+    this.config = config
+    super()
   }
 
-  return dp
-}
+  type() {
+    return 'twitch'
+  }
 
-TwitchCommander.register('item', (message, obj) => TwitchHandler(message, obj).search('items', false))
-TwitchCommander.register('mob', (message, obj) => TwitchHandler(message, obj).search('monster', false))
-TwitchCommander.register('map', (message, obj) => TwitchHandler(message, obj).search('map', false))
-TwitchCommander.register('skill', (message, obj) => TwitchHandler(message, obj).search('skill', false))
-TwitchCommander.register('npc', (message, obj) => TwitchHandler(message, obj).search('npc', false))
-TwitchCommander.register('quest', (message, obj) => TwitchHandler(message, obj).search('quest', false))
-TwitchCommander.register('xp', (message, obj) => TwitchHandler(message, obj).exp(false))
-
-module.exports = (api_key, username, token, channels) => {
-  let TwitchClient
-
-  try {
-    TwitchClient = new TwitchJS.client({
+  connect() {
+    this.client = new TwitchJS.client({
       connection: {
         reconnect: true,
         secure: true
       },
       identity: {
-        username: username,
-        password: token,
+        username: this.config.username,
+        password: this.config.token,
       },
-      channels: channels
+      channels: this.config.channels
     })
 
-    TwitchClient.on('connecting', () => console.log('twitch: connecting...'))
-    TwitchClient.on('connected', () => console.log('twitch: connected!'))
-    TwitchClient.on('disconnected', (r) => console.log('twitch: disconnected!' + r))
-    TwitchClient.on('chat', (channel, userstate, message, self) => {
-      if (self) return
-      TwitchCommander.parse(message, {
-        key: api_key,
-        client: TwitchClient,
-        channel: channel
-      })
-    });
+    this.client.on('connecting', () => console.log('twitch: connecting...'))
+    this.client.on('connected', () => console.log('twitch: connected!'))
+    this.client.on('disconnected', (r) => console.log('twitch: disconnected!' + r))
+    this.client.connect()
+  }
 
-    TwitchClient.connect()
-  } catch (e) {
-    console.log('error: ' + e.message)
+  listen() {
+    this.client.on('chat', (channel, userstate, message, self) => {
+      if (self) return
+      this.emit('message', message, {
+        channel: channel,
+        handler: this
+      })
+    })
+  }
+
+  reply(content, attr) {
+    this.message(content, attr)
+  }
+
+  message(content, attr) {
+    attr.client.say(attr.channel, content)
   }
 }
-
