@@ -1,9 +1,9 @@
-const request = require('request')
-const cheerio = require('cheerio')
-const _ = require('underscore')
-const Api = require('./api')
+import request from 'request'
+import cheerio from 'cheerio'
+import _ from 'underscore'
+import Api from './api.js'
 
-class DivinePride {
+export default class DivinePride {
 
   constructor(input, apiKey) {
     this.api = new Api(apiKey)
@@ -223,5 +223,3 @@ class DivinePride {
   }
 
 }
-
-module.exports = DivinePride

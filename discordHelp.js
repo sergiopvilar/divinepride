@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   "embed": {
     color: 0xffffff,
     title: "Ajuda do DivinePride",

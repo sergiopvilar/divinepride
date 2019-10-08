@@ -1,5 +1,6 @@
-const TwitchClient = require('./clients/twitch.js')
-const DiscordClient = require('./clients/discord.js')
+import Client from './clients/client.js'
+import DiscordHandler from './clients/discord.js'
+import TwitchHandler from './clients/twitch.js'
 
 /**
  * Config object
@@ -13,7 +14,13 @@ const DiscordClient = require('./clients/discord.js')
  *  api_key: 'foo'
  * }
  */
-module.exports = function(config) {
-  TwitchClient(config.api_key, config.twitch.username, config.twitch.token, config.twitch.channels)
-  DiscordClient(config.api_key, config.discord_token)
+export default (config) => {
+  if (typeof config.api_key)
+    throw new Error('api_key is empty and is required to consume DivinePride data')
+
+  if (typeof config.discord_token !== 'undefined')
+    Client(config.api_key, new DiscordHandler(config.discord_token))
+
+  if (typeof config.twitch !== 'undefined')
+    Client(config.api_key, new TwitchHandler(config.twitch))
 }

@@ -1,6 +1,9 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
+import hub from './hub.js'
 
-const hub = require('./hub.js')({
+dotenv.config()
+
+hub({
   api_key: process.env.API_KEY,
   discord_token: process.env.BOT_TOKEN,
   twitch: {
