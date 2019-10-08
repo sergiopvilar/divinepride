@@ -1,8 +1,8 @@
-import Commander from 'chatbot-commander'
-import discordHelp from '../discordHelp'
-import DivinePride from '../divine/divine.js/index.js'
+import ChatbotCommander from 'chatbot-commander'
+import discordHelp from '../discordHelp.js'
+import DivinePride from '../divine/divine.js'
 
-const Commander = new Commander()
+const Commander = new ChatbotCommander()
 
 function DivineHandler(input, attr) {
   let dp
@@ -61,7 +61,7 @@ Commander.register({
   if(attr.handler.type === 'discord') attr.handler.message("", discordHelp)
 })
 
-module.exports = (api_key, handler) => {
+export default (api_key, handler) => {
   try {
     handler.on('message', (content, attr) => {
       Commander.handle(content, Object.assign({

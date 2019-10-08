@@ -1,12 +1,7 @@
-import Handler from './handler'
+import Handler from './handler.js'
 import TwitchJS from 'twitch-js'
 
 export default class Twitch extends Handler {
-
-  constructor(config) {
-    this.config = config
-    super()
-  }
 
   type() {
     return 'twitch'

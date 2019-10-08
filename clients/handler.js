@@ -2,7 +2,9 @@ import Events from 'events'
 
 export default class Handler extends Events {
 
-  constructor() {
+  constructor(config) {
+    super()
+    this.config = config
     this.connect();
     this.listen();
   }

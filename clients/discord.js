@@ -1,11 +1,7 @@
+import Handler from './handler.js'
 import Discord from 'discord.js'
 
-export default class DiscordHandler {
-
-  constructor(token) {
-    this.token = token
-    super()
-  }
+export default class DiscordHandler extends Handler {
 
   type() {
     return 'discord'
@@ -17,7 +13,7 @@ export default class DiscordHandler {
       console.log('discord: connected!')
       this.client.user.setActivity('Digite !dp')
     });
-    this.client.login(this.token);
+    this.client.login(this.config);
   }
 
   listen() {

@@ -1,6 +1,6 @@
-const request = require('request')
+import request from 'request'
 
-class API {
+export default class API {
 
   constructor(apiKey) {
     this.apiKey = apiKey
@@ -23,5 +23,3 @@ class API {
   }
 
 }
-
-module.exports = API
