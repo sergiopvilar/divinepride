@@ -6,6 +6,7 @@
   "rules": {
     "import/extensions": "off",
     "no-console": "off",
-    "no-process-env": "off"
+    "no-process-env": "off",
+    "array-callback-return": "off"
   }
 }
