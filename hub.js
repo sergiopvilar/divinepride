@@ -15,7 +15,7 @@ import TwitchHandler from './clients/twitch.js';
  * }
  */
 const hub = (config) => {
-  if (typeof config.api_key !== 'undefined') {
+  if (typeof config.api_key === 'undefined') {
     throw new Error('api_key is empty and is required to consume DivinePride data');
   }
 
