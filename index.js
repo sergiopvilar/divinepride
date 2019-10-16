@@ -1,14 +1,14 @@
-import dotenv from 'dotenv'
-import hub from './hub.js'
+import dotenv from 'dotenv';
+import hub from './hub.js';
 
-dotenv.config()
+dotenv.config();
 
 hub({
-  api_key: process.env.API_KEY,
-  discord_token: process.env.BOT_TOKEN,
+  api_key: process.env.API_KEY, // eslint-disable-line babel/camelcase
+  discord_token: process.env.BOT_TOKEN, // eslint-disable-line babel/camelcase
   twitch: {
     username: process.env.TWITCH_USERNAME,
     token: process.env.TWITCH_TOKEN,
-    channels: process.env.TWITCH_CHANNEL.split(',')
-  }
-})
+    channels: process.env.TWITCH_CHANNEL.split(','),
+  },
+});

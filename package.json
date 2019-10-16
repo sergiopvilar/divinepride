@@ -21,5 +21,9 @@
     "twitch-js": "^1.2.17",
     "underscore": "^1.8.3"
   },
-  "description": "A Discord bot for DivinePride"
+  "description": "A Discord bot for DivinePride",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-plugin-shopify": "^30.0.1"
+  }
 }
