@@ -1,46 +1,49 @@
-import Handler from './handler.js'
-import TwitchJS from 'twitch-js'
+import TwitchJS from 'twitch-js';
+import Handler from './handler.js';
 
 export default class Twitch extends Handler {
 
   type() {
-    return 'twitch'
+    return 'twitch';
   }
 
   connect() {
-    this.client = new TwitchJS.client({
+    this.client = new TwitchJS.client({ // eslint-disable-line babel/new-cap
       connection: {
         reconnect: true,
-        secure: true
+        secure: true,
       },
       identity: {
         username: this.config.username,
         password: this.config.token,
       },
-      channels: this.config.channels
-    })
+      channels: this.config.channels,
+    });
 
-    this.client.on('connecting', () => console.log('twitch: connecting...'))
-    this.client.on('connected', () => console.log('twitch: connected!'))
-    this.client.on('disconnected', (r) => console.log('twitch: disconnected!' + r))
-    this.client.connect()
+    this.client.on('connecting', () => console.log('twitch: connecting...'));
+    this.client.on('connected', () => console.log('twitch: connected!'));
+    this.client.on('disconnected', (error) => console.log(`twitch: disconnected!' ${error}`));
+    this.client.connect();
   }
 
   listen() {
     this.client.on('chat', (channel, userstate, message, self) => {
-      if (self) return
+      if (self) {
+        return;
+      }
+
       this.emit('message', message, {
-        channel: channel,
-        handler: this
-      })
-    })
+        channel,
+        handler: this,
+      });
+    });
   }
 
   reply(content, attr) {
-    this.message(content, attr)
+    this.message(content, attr);
   }
 
   message(content, attr) {
-    attr.client.say(attr.channel, content)
+    attr.client.say(attr.channel, content);
   }
 }
