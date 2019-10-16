@@ -41,10 +41,9 @@ export default class DivinePride {
       let itemName;
       let itemLowerCase;
 
-      matches.forEach((el) => {
+      matches.map((index, el) => {
         itemName = this.$(el).find('a').text()
                                        .toLowerCase();
-
         if (counter === 0) {
           first = this.$(el).find('a').attr('href');
         }
@@ -55,7 +54,7 @@ export default class DivinePride {
       });
 
       if (!choosen) {
-        matches.forEach((el) => {
+        matches.map((index, el) => {
           itemLowerCase = this.$(el).find('a').text()
                                               .toLowerCase()
                                               .indexOf(input.toLowerCase());
@@ -131,16 +130,12 @@ export default class DivinePride {
       this.api.fetch('Monster', arr[3], (obj) => {
         modifier = this.expMultiplier(obj.stats.level, levelBase);
 
-        message += `${obj.name}\n`;
-        message += `http://www.divine-pride.net${res}\n`;
-        if (markup) {
-          message += "```\n";
-        }
-        message += `Base XP: ${Math.round(obj.stats.baseExperience * modifier)} (${Math.round(modifier * 100)}%)\n`;
-        message += `Job XP: ${Math.round(obj.stats.jobExperience * modifier)} (${Math.round(modifier * 100)}%)\n`;
-        if (markup) {
-          message += "```\n";
-        }
+        message += `${obj.name}
+http://www.divine-pride.net${res}
+${markup ? "```\n" : ""}
+Base XP: ${Math.round(obj.stats.baseExperience * modifier)} (${Math.round(modifier * 100)}%)
+Job XP: ${Math.round(obj.stats.jobExperience * modifier)} (${Math.round(modifier * 100)}%)
+${markup ? "```\n" : ""}`;
 
         this.trigger('message', message);
       });
@@ -150,15 +145,13 @@ export default class DivinePride {
   fixDescription(description) {
     let hex;
     let desc = description.replace("\n", "");
+    const replaceables = ['^ffffff_^000000', '^FFFFFF ^000000', '^FFFFFF  ^000000', '^FFFFFF  ^000000', /\^FFFFFF/g,
+      /\^ffffff/g, /\^000000/g, /\^00000/g];
 
-    desc = desc.replace('^ffffff_^000000', '');
-    desc = desc.replace('^FFFFFF ^000000', '');
-    desc = desc.replace('^FFFFFF  ^000000', '');
-    desc = desc.replace('^FFFFFF  ^000000', '');
-    desc = desc.replace(/\^FFFFFF/g, '');
-    desc = desc.replace(/\^ffffff/g, '');
-    desc = desc.replace(/\^000000/g, '');
-    desc = desc.replace(/\^00000/g, '');
+    replaceables.forEach((rep) => {
+      desc = desc.replace(rep, '');
+      return desc;
+    });
 
     while (desc.indexOf('^') > -1) {
       hex = desc.substring(desc.indexOf('^') + 1, desc.indexOf('^') + 7);
@@ -176,19 +169,14 @@ export default class DivinePride {
     const arr = res.split('/');
 
     return this.api.fetch(arr[2], arr[3], (obj) => {
-      let message = '';
-
       if (!obj) {
         return this.trigger('reply', `Não é possível encontrar um resultado para '${this.input}'.`);
       }
 
-      message += `${obj.name}\n`;
-      message += `http://www.divine-pride.net${res}\n`;
-
+      let message = `${obj.name}\nhttp://www.divine-pride.net${res}\n`;
       if (markup) {
-        message += "```\n";
-        message += `${this.fixDescription(obj.description)}\n`;
-        message += "```\n";
+        message += `${"```"}${this.fixDescription(obj.description)}
+                    \n${obj.cardPrefix ? `Sufixo: ${obj.cardPrefix}` : ''}${"```"}`;
       }
 
       this.trigger('message', message);
@@ -224,18 +212,15 @@ export default class DivinePride {
       vulnerabilities.sort((prev, next) => next.value - prev.value);
       vulnerabilities = vulnerabilities.map((item) => `${item.element}(${item.value}%)`);
 
-      message += `${obj.name}\n`;
-      message += `http://www.divine-pride.net${res}`;
-      if (markup) {
-        message += "\n```\n";
-        message += `Nível: ${obj.stats.level}\n`;
-        message += `HP: ${obj.stats.health}\n`;
-        message += `Precisão: ${obj.stats.hit}\n`;
-        if (vulnerabilities.length > 0) {
-          message += `Vulnerabilidades: ${vulnerabilities.join(', ')}`;
-        }
+      message += `${obj.name}\nhttp://www.divine-pride.net${res}`;
 
-        message += "```\n";
+      if (markup) {
+        message += `
+${"```"}Nível: ${obj.stats.level}
+HP: ${obj.stats.health}
+Precisão: ${obj.stats.hit}
+${vulnerabilities.length > 0 ? `Vulnerabilidades: ${vulnerabilities.join(', ')}` : ''}
+${"```"}\n`;
       }
 
       this.trigger('message', message);
